@@ -1,13 +1,11 @@
 <?php
 /*
 Plugin Name: WPFrontend
-Plugin URI: https://wordpress.org/plugins/login-recaptcha/
+Plugin URI: https://github.com/anuchit33/wp-frontend.git
 Description: Plugin frontend
 Author: Anuchit Yai-in
-Version: 1.6.4
-Author URI: https://github.com/cyberscribe/login-recaptcha
-Text Domain: login-recaptcha
-Domain Path: /languages/
+Version: 0.0.1
+Author URI: https://github.com/anuchit33/
 */
 
 if ( !function_exists( 'add_action' ) ) {
@@ -18,8 +16,8 @@ class WPFrontend {
 
     public static function init() {
 
-
     }
 
 }
+
 WPFrontend::init();
