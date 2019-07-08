@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: WPFrontend
+Plugin Name: WordPress Frontend
 Plugin URI: https://github.com/anuchit33/wp-frontend.git
 Description: Plugin frontend
 Author: Anuchit Yai-in
