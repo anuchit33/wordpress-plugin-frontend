@@ -1,4 +1,4 @@
-# wp-frontend
+# wprdpress-plugin-frontend
 
 
 ## Setup Plugin
