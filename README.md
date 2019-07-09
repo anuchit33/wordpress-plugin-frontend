@@ -1,7 +1,7 @@
 # WordPress Plugin Frontend
 การสร้าง WordPress Plugin สำหรับแสดงผลส่วน Frontend
 - Form submit
-- Ajax request 
+- Ajax request and HTTP API
 
 ## Form Submit
 ### 1.Header Requirements
@@ -267,7 +267,7 @@ wp_enqueue_style('style-css', '/wp-content/plugins/wordpress-plugin-frontend/inc
         add_action('wp_ajax_nopriv_get_gold_price', array($this, 'wp_api_get_gold_price'));
     }
     
-    function wp_api_get_gold_price($atts){
+    function wp_api_get_gold_price(){
     }
 ```
 
