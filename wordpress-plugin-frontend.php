@@ -18,6 +18,11 @@ class WordPressPluginFrontend {
 
         # Shortcode
         add_shortcode('shortcode-wp-frontend', array($this, 'wp_shortcode_display'));
+        add_shortcode('shortcode-wp-gold-price', array($this, 'wp_shortcode_display_gold_price'));
+
+        # add action get
+        add_action('wp_ajax_get_gold_price', array($this, 'wp_api_get_gold_price'));
+        add_action('wp_ajax_nopriv_get_gold_price', array($this, 'wp_api_get_gold_price'));
 
     }
 
@@ -81,6 +86,16 @@ class WordPressPluginFrontend {
         return $content;
     }
 
+    function wp_shortcode_display_gold_price($atts) {
+
+        ob_start();
+        require_once( dirname(__FILE__) . '/templates/frontend/table-gold-price.php');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        return $content;
+    }
+
     function save_post(){
         if (isset($_POST['email'])){
             if (! isset( $_POST['csrf'] ) || ! wp_verify_nonce( $_POST['csrf'], 'post-contact' )){
@@ -100,6 +115,22 @@ class WordPressPluginFrontend {
         }
     }
 
+    function wp_api_get_gold_price(){
+
+        # check ajax_security
+        check_ajax_referer('ajax_security', 'security');
+
+        # filter date
+        $date = isset($_GET['date'])?$_GET['date']:date('Y-m-d');
+
+        # fetch gold price
+        $args = array();
+        $url = 'https://www.aagold-th.com/price/daily/?date='.$date;
+        $response = wp_remote_get( $url );
+        $body = wp_remote_retrieve_body( $response );
+        wp_send_json(json_decode($body,true)[0],200);
+        die();
+    }
 }
 
 new WordPressPluginFrontend();

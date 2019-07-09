@@ -1,3 +1,55 @@
 .btn-submit-contact {
     background: #aa0c0b;
 }
+.row {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+.bd-example-row .row>.col, .bd-example-row .row>[class^=col-] {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    background-color: rgba(86,61,124,.15);
+    border: 1px solid rgba(86,61,124,.2);
+}
+.col {
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width: 100%;
+}
+.col {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+table.table.table-goldprice {
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: 0.5rem;
+    overflow: hidden;
+}
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+}
+table {
+    border-collapse: collapse;
+}
+table.table.table-goldprice td.bg {
+    background: #e2cda0;
+}
+
+table.table.table-goldprice td, table.table.table-goldprice th {
+    padding: .75rem;
+    vertical-align: top;
+    border: 2px solid #e2cda0;
+    color: #2f2f2f;
+    font-size: .8rem;
+}

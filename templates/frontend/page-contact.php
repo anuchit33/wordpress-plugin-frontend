@@ -1,12 +1,3 @@
-<?php
-
-# wp_enqueue_script
-wp_enqueue_script('equiz', '/wp-content/plugins/wordpress-plugin-frontend/inc/js/applications.js', array('jquery'), 1.1, true);
-
-# wp_enqueue_style
-wp_enqueue_style('style-css', '/wp-content/plugins/wordpress-plugin-frontend/inc/css/style.css');
-
-?>
 <form method="POST">
   <?php wp_nonce_field( 'post-contact','csrf' ); ?>
   <div class="form-group">
