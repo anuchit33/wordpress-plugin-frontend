@@ -199,7 +199,7 @@ Shortcode : `[contact-us]`
         }
     }
 ```
-wp_shortcode_display เรียกฟังก์ชั่น save post
+wp_shortcode_display เรียกฟังก์ชั่น action_post()
 ```
     function wp_shortcode_display($atts) {
         # handle action POST
