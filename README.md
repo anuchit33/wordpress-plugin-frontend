@@ -1,5 +1,5 @@
 # WordPress Plugin Frontend
-การสร้าง WordPress Plugin สำหรับแสดงผลส่วน Frontend
+ขั้นตอนสร้าง WordPress Plugin สำหรับแสดงผลส่วน Frontend
 
 ### 1.Header Requirements
 สร้างไฟล์ wp-content/plugins/wordpress-plugin-frontend/`wordpress-plugin-frontend.php`
