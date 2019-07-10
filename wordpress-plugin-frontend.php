@@ -40,19 +40,34 @@ class WordPressPluginFrontend {
         # save page_id
         update_option( 'wp-frontend', $page_id );
 
-        /**2. create table**/
+        /**2. create table contact_message**/
         global $wpdb;
         $table_name = $wpdb->prefix.'contact_message';
         $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE `$table_name` (
-            `id` int(11) UNSIGNED NOT NULL,
+        $sql_contact_message = "CREATE TABLE `$table_name` (
+            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(55) NOT NULL,
             `email` varchar(55) NOT NULL,
             `message` text NOT NULL,
-            `created_datetime` datetime NOT NULL
-          ) ENGINE=InnoDB DEFAULT CHARSET=latin1; 
-          ALTER TABLE `wp_contact_message` ADD PRIMARY KEY (`id`);";
+            `created_datetime` datetime NOT NULL,
+		    UNIQUE KEY id (id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        
+        /**3. create table contact_email**/
+        global $wpdb;
+        $table_name = $wpdb->prefix.'contact_email';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql_contact_email = "CREATE TABLE `$table_name` (
+            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(55) NOT NULL,
+            `email` varchar(55) NOT NULL,
+		    UNIQUE KEY id (id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+        # 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql );
+        dbDelta( $sql_contact_message );
+        dbDelta( $sql_contact_email );
     }
 
     function wp_deactivation(){
@@ -104,13 +119,14 @@ class WordPressPluginFrontend {
             }
 
             global $wpdb;
-            $post = array(
-                'email'    => $_POST['email'],
-                'message'  => $_POST['message'],
-                'created_datetime' => date('Y-m-s H:i:s'),
+            $data = array(
+                'name'    => sanitize_text_field($_POST['name']),
+                'email'    => sanitize_text_field($_POST['email']),
+                'message'  => sanitize_text_field($_POST['message']),
+                'created_datetime' => date('Y-m-d H:i:s'),
             );
             $tablename = $wpdb->prefix . 'contact_message';
-            $wpdb->insert($tablename, $post);
+            $wpdb->insert($tablename, $data);
             echo 'Saved your post successfully! :)';
         }
     }
