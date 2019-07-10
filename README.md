@@ -45,6 +45,8 @@ new WordPressPluginFrontend();
 2. สร้างตาราง contact_email
 ```
     function wp_activation(){
+        global $wpdb;
+
         /**1. create page**/
         # create page Contact-US
         $page_id = wp_insert_post(array(
@@ -70,6 +72,7 @@ new WordPressPluginFrontend();
             `created_datetime` datetime NOT NULL,
 		    UNIQUE KEY id (id)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        $wpdb->query($sql_contact_message);
         
         /**3. create table contact_email**/
         global $wpdb;
@@ -81,20 +84,33 @@ new WordPressPluginFrontend();
             `email` varchar(55) NOT NULL,
 		    UNIQUE KEY id (id)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
-
-        # 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql_contact_message );
-        dbDelta( $sql_contact_email );
+        $wpdb->query($sql_contact_email);
     }
 ```
 
-### 5. สร้างเพจหลังจาก deactivation
+### 5. Handle deactivation
+1. ลบเพจ Contact-US
+2. ลบตาราง contact_message
+2. ลบตาราง contact_email
 ```
     function wp_deactivation(){
-        # delete page
+
+        global $wpdb;
+
+        # 1.delete page 
         $page_id = get_option('wp-frontend');
         wp_delete_post($page_id);
+
+        # 2.delete table contact_message
+        $table_name = $wpdb->prefix . 'contact_message';
+        $sql = "DROP TABLE IF EXISTS $table_name";
+        $wpdb->query($sql);
+
+        # 3.delete table contact_email
+        $table_name = $wpdb->prefix . 'contact_email';
+        $sql = "DROP TABLE IF EXISTS $table_name";
+        $wpdb->query($sql);
+
     }
 ```
 
@@ -145,8 +161,7 @@ Shortcode : `[contact-us]`
 </form>
 ```
 
-### 8. action post
-เพิ่มฟังก์ชั่น action_post()
+### เพิ่มฟังก์ชั่น action_post()
 - บันทึกข้อมูลผู้ติดต่อลงตาราง
 - ส่งเมลแจ้ง
 ```
@@ -188,7 +203,7 @@ wp_shortcode_display เรียกฟังก์ชั่น save post
 ```
     function wp_shortcode_display($atts) {
         # handle action POST
-        $this->save_post();
+        $this->action_post();
         ...    
     }
 ```
