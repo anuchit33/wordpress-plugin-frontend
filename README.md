@@ -24,6 +24,7 @@ new WordPressPluginFrontend();
 ```
 
 ### 3.Activation / Deactivation Hooks
+- doc https://developer.wordpress.org/plugins/plugin-basics/activation-deactivation-hooks/
 เพิ่มเข้าไปในส่วนของ __construct()
 ```
     function __construct() {
@@ -116,6 +117,7 @@ new WordPressPluginFrontend();
 
 ### 6. Add Shortcode และการ  Handle display
 Shortcode : `[contact-us]`
+- doc shortcode https://developer.wordpress.org/plugins/shortcodes/
 ```
     function __construct() {
         ...
