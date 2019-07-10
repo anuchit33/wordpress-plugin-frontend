@@ -42,6 +42,7 @@ new WordPressPluginFrontend();
 ### 4. Handle activation
 1. สร้างเพจ Contact-US
 2. สร้างตาราง contact_message
+2. สร้างตาราง contact_email
 ```
     function wp_activation(){
         /**1. create page**/
@@ -57,19 +58,34 @@ new WordPressPluginFrontend();
         # save page_id
         update_option( 'wp-frontend', $page_id );
 
-        /**2. create table**/
+        /**2. create table contact_message**/
         global $wpdb;
         $table_name = $wpdb->prefix.'contact_message';
         $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE `$table_name` (
+        $sql_contact_message = "CREATE TABLE `$table_name` (
             `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `subject` varchar(55) NOT NULL,
             `email` varchar(55) NOT NULL,
             `message` text NOT NULL,
             `created_datetime` datetime NOT NULL,
 		    UNIQUE KEY id (id)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        
+        /**3. create table contact_email**/
+        global $wpdb;
+        $table_name = $wpdb->prefix.'contact_email';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql_contact_email = "CREATE TABLE `$table_name` (
+            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(55) NOT NULL,
+            `email` varchar(55) NOT NULL,
+		    UNIQUE KEY id (id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+
+        # 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql );
+        dbDelta( $sql_contact_message );
+        dbDelta( $sql_contact_email );
     }
 ```
 
