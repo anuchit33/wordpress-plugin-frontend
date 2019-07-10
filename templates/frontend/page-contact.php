@@ -1,9 +1,9 @@
-<form method="POST">
+<form method="POST" action="<?php the_permalink();?>">
   <?php wp_nonce_field( 'post-contact','csrf' ); ?>
 
   <div class="form-group">
-    <label for="name">Name</label>
-    <input type="text" class="form-control" id="name" name ="name" aria-describedby="nameHelp" placeholder="Enter name">
+    <label for="name">Subject</label>
+    <input type="text" class="form-control" id="subject" name ="subject" aria-describedby="subjectHelp" placeholder="Enter subject">
   </div>
   <div class="form-group">
     <label for="email">Email address</label>

@@ -1,9 +1,6 @@
 # WordPress Plugin Frontend
 การสร้าง WordPress Plugin สำหรับแสดงผลส่วน Frontend
-- Form submit
-- Ajax request and HTTP API
 
-## Form Submit
 ### 1.Header Requirements
 สร้างไฟล์ wp-content/plugins/wordpress-plugin-frontend/`wordpress-plugin-frontend.php`
 ```
@@ -14,7 +11,6 @@ Plugin URI: https://github.com/anuchit33/wordpress-plugin-frontend
 Description: wordpress-plugin-frontend
 Author: Anuchit Yai-in
 Version: 0.0.1
-Author URI: https://github.com/anuchit33/wordpress-plugin-frontend
 */
 ```
 
@@ -87,7 +83,7 @@ new WordPressPluginFrontend();
 ```
 
 ### 6. Add Shortcode และการ  Handle display
-Shortcode : `[wp_shortcode_display]`
+Shortcode : `[shortcode-wp-frontend]`
 ```
     function __construct() {
         ...
@@ -113,38 +109,62 @@ Shortcode : `[wp_shortcode_display]`
 ### 7. สร้าง template
 สร้างไฟล์ `wordpress-plugin-frontend/themepates/frontend/page-contact.php`
 ```
-<form method="POST">
+<form method="POST" action="<?php the_permalink();?>">
   <?php wp_nonce_field( 'post-contact','csrf' ); ?>
+
+  <div class="form-group">
+    <label for="name">Subject</label>
+    <input type="text" class="form-control" id="subject" name ="subject" aria-describedby="subjectHelp" placeholder="Enter subject">
+  </div>
   <div class="form-group">
     <label for="email">Email address</label>
     <input type="email" class="form-control" id="email" name ="email" aria-describedby="emailHelp" placeholder="Enter email">
   </div>
-  <div class="form-group mt-3">
+  <br/>
+  <div class="form-group">
     <label for="message">Message</label>
     <textarea class="form-control" id="message"  name="message" rows="3" placeholder="Message..."></textarea>
   </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary btn-submit-contact" >Submit</button>
 </form>
 ```
 
-### 8. Save Post
-เพิ่มฟังก์ชั่น save_post()
+### 8. action post
+เพิ่มฟังก์ชั่น action_post()
+- บันทึกข้อมูลผู้ติดต่อลงตาราง
+- ส่งเมลแจ้ง
 ```
-    function save_post(){
-        if (isset($_POST['email'])){
+    function action_post(){
+        if (isset($_POST['subject'])){
             if (! isset( $_POST['csrf'] ) || ! wp_verify_nonce( $_POST['csrf'], 'post-contact' )){
                 echo 'Sorry, your nonce did not verify.';
                 exit;
             }
+
             global $wpdb;
-            $post = array(
+            $data = array(
+                'subject'    => sanitize_text_field($_POST['subject']),
                 'email'    => sanitize_text_field($_POST['email']),
-                'message'  => $_POST['message'],
+                'message'  => sanitize_text_field($_POST['message']),
                 'created_datetime' => date('Y-m-d H:i:s'),
             );
             $tablename = $wpdb->prefix . 'contact_message';
-            $wpdb->insert($tablename, $post);
+            $wpdb->insert($tablename, $data);
             echo 'Saved your post successfully! :)';
+
+
+            // send email
+            $tablename = $wpdb->prefix . 'contact_email';
+            $results = $wpdb->get_results("SELECT * FROM " . $tablename . " ", OBJECT);
+            $to = array();
+            foreach ($results as $v) {
+                $to[] = $v->email;
+            }
+            $subject = 'Contact Us';
+            $message = "Subject: " . $data["subject"] . " \n Email: " . $data["email"] . " \n Message: \n " . $data["message"] . "";
+            $headers = array('From: '.$data['email'].' <'.$data['email'].'>');
+
+            wp_mail($to, $subject, $message, $headers);
         }
     }
 ```
@@ -156,143 +176,3 @@ wp_shortcode_display เรียกฟังก์ชั่น save post
         ...    
     }
 ```
-
-## Ajax request and HTTP API
-### 1. Add Shotcode สำหรับแสดงราคาทอง  
-Shotcode: `[wp_shortcode_display_gold_price]`
----
-    function __construct() {
-        # Shortcode
-        ...
-        add_shortcode('shortcode-wp-gold-price', array($this, 'wp_shortcode_display_gold_price'));
-    }
-    
-    function wp_shortcode_display_gold_price($atts) {
-        ob_start();
-        require_once( dirname(__FILE__) . '/templates/frontend/table-gold-price.php');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        return $content;
-    }
----
-
-สร้างไฟล์  `wordpress-plugin-frontend/themepates/frontend/table-gold-price.php`
-```
-<?php
-# wp_enqueue_style
-wp_enqueue_style('style-css', '/wp-content/plugins/wordpress-plugin-frontend/inc/css/style.css');
-?>
-<input type="date" value="<?=date('Y-m-d')?>" max="<?=date('Y-m-d')?>" name="date" id="inputDate" />
-<br/>
-<div class="row">
-    <div class="col">
-        <table class="table table-goldprice ">
-            <tbody>
-                <tr>
-                    <td class="bg" colspan="2">ทองคำ 96.5% (บาทละ)</td>
-                </tr>
-                <tr>
-                    <td class="text-center"><small>ราคารับซื้อ</small></td>
-                    <td class="text-center"><small>ราคาขายออก</small></td>
-                </tr>
-                <tr>
-                    <td class="text-center"><span id="bar965_sell_baht"></span></td>
-                    <td class="text-center"><span id="bar965_buy_baht"></span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col">
-            <table class="table table-goldprice ">
-                <tbody>
-                    <tr>
-                        <td class="bg" colspan="2">ทองรูปพรรณ 96.5% (บาทละ)</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><small>ราคารับซื้อ</small></td>
-                        <td class="text-center"><small>ราคาขายออก</small></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span id="ornament965_sell_baht"></span></td>
-                        <td class="text-center"><span id="ornament965_buy_baht"></span></td>
-                    </tr>
-                </tbody>
-            </table>
-    </div>
-</div>
-
-<script type="text/javascript">
-    var $ajax_nonce = '<?=wp_create_nonce( "ajax_security" )?>';
-    var $ajax_url = '<?=admin_url('admin-ajax.php')?>';
-
-    jQuery(document).ready(function ($) {
-        var getGoldPriceByDate = function (date = '') {
-            var data = {
-                action: 'get_gold_price',
-                security: $ajax_nonce,
-                date: date
-            };
-            $.ajax({
-                type: 'get',
-                url: $ajax_url,
-                data: data,
-                dataType: 'json',
-                success: function (response) {
-                    $('#bar965_sell_baht').html(response.bar965_sell_baht)
-                    $('#bar965_buy_baht').html(response.bar965_buy_baht)
-                    $('#ornament965_sell_baht').html(response.ornament965_sell_baht)
-                    $('#ornament965_buy_baht').html(response.ornament965_buy_baht)
-                }
-            });
-        }
-
-        // ready load
-        getGoldPriceByDate($('#inputDate').val())
-
-        // event
-        $('#inputDate').change(function(){
-            getGoldPriceByDate($('#inputDate').val())
-        })
-
-    });
-</script>
-```
-### 2. Add Action
-```
-    function __construct() {
-        ...
-        # add action get
-        add_action('wp_ajax_get_gold_price', array($this, 'wp_api_get_gold_price'));
-        add_action('wp_ajax_nopriv_get_gold_price', array($this, 'wp_api_get_gold_price'));
-    }
-    
-    function wp_api_get_gold_price(){
-    }
-```
-
-### 2. function wp_qpi_get_gold_price
-1. รอรับ ajax request
-2. HTTP Api ดึงข้อมูลราคาทองจากเว็บ aagold-th
-```
-    function wp_api_get_gold_price(){
-
-        # check ajax_security
-        check_ajax_referer('ajax_security', 'security');
-
-        # query string date
-        $date = isset($_GET['date'])?$_GET['date']:date('Y-m-d');
-
-        # fetch gold price
-        $args = array();
-        $url = 'https://www.aagold-th.com/price/daily/?date='.$date;
-        $response = wp_remote_get( $url );
-        $body = wp_remote_retrieve_body( $response );
-        wp_send_json(json_decode($body,true)[0],200);
-        die();
-    }
-```
-
-# Setup Plugin
-1. Run `cd wordpress-demo/web/docroot/wp-content/plugin/`
-2. Run `git clone https://github.com/anuchit33/wordpress-plugin-frontend.git` 

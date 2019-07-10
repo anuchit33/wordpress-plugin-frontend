@@ -5,7 +5,6 @@ Plugin URI: https://github.com/anuchit33/wordpress-plugin-frontend
 Description: wordpress-plugin-frontend
 Author: Anuchit Yai-in
 Version: 0.0.1
-Author URI: https://github.com/anuchit33/wordpress-plugin-frontend
 */
 
 class WordPressPluginFrontend {
@@ -18,7 +17,6 @@ class WordPressPluginFrontend {
 
         # Shortcode
         add_shortcode('shortcode-wp-frontend', array($this, 'wp_shortcode_display'));
-        add_shortcode('shortcode-wp-gold-price', array($this, 'wp_shortcode_display_gold_price'));
 
         # add action get
         add_action('wp_ajax_get_gold_price', array($this, 'wp_api_get_gold_price'));
@@ -46,7 +44,7 @@ class WordPressPluginFrontend {
         $charset_collate = $wpdb->get_charset_collate();
         $sql_contact_message = "CREATE TABLE `$table_name` (
             `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `name` varchar(55) NOT NULL,
+            `subject` varchar(55) NOT NULL,
             `email` varchar(55) NOT NULL,
             `message` text NOT NULL,
             `created_datetime` datetime NOT NULL,
@@ -91,7 +89,7 @@ class WordPressPluginFrontend {
     function wp_shortcode_display($atts) {
 
         # handle action POST
-        $this->save_post();
+        $this->action_post();
 
         ob_start();
         require_once( dirname(__FILE__) . '/templates/frontend/page-contact.php');
@@ -101,18 +99,8 @@ class WordPressPluginFrontend {
         return $content;
     }
 
-    function wp_shortcode_display_gold_price($atts) {
-
-        ob_start();
-        require_once( dirname(__FILE__) . '/templates/frontend/table-gold-price.php');
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        return $content;
-    }
-
-    function save_post(){
-        if (isset($_POST['email'])){
+    function action_post(){
+        if (isset($_POST['subject'])){
             if (! isset( $_POST['csrf'] ) || ! wp_verify_nonce( $_POST['csrf'], 'post-contact' )){
                 echo 'Sorry, your nonce did not verify.';
                 exit;
@@ -120,7 +108,7 @@ class WordPressPluginFrontend {
 
             global $wpdb;
             $data = array(
-                'name'    => sanitize_text_field($_POST['name']),
+                'subject'    => sanitize_text_field($_POST['subject']),
                 'email'    => sanitize_text_field($_POST['email']),
                 'message'  => sanitize_text_field($_POST['message']),
                 'created_datetime' => date('Y-m-d H:i:s'),
@@ -128,25 +116,23 @@ class WordPressPluginFrontend {
             $tablename = $wpdb->prefix . 'contact_message';
             $wpdb->insert($tablename, $data);
             echo 'Saved your post successfully! :)';
+
+
+            // send email
+            $tablename = $wpdb->prefix . 'contact_email';
+            $results = $wpdb->get_results("SELECT * FROM " . $tablename . " ", OBJECT);
+            $to = array();
+            foreach ($results as $v) {
+                $to[] = $v->email;
+            }
+            $subject = 'Contact Us';
+            $message = "Subject: " . $data["subject"] . " \n Email: " . $data["email"] . " \n Message: \n " . $data["message"] . "";
+            $headers = array('From: '.$data['email'].' <'.$data['email'].'>');
+
+            wp_mail($to, $subject, $message, $headers);
         }
     }
 
-    function wp_api_get_gold_price(){
-
-        # check ajax_security
-        check_ajax_referer('ajax_security', 'security');
-
-        # filter date
-        $date = isset($_GET['date'])?$_GET['date']:date('Y-m-d');
-
-        # fetch gold price
-        $args = array();
-        $url = 'https://www.aagold-th.com/price/daily/?date='.$date;
-        $response = wp_remote_get( $url );
-        $body = wp_remote_retrieve_body( $response );
-        wp_send_json(json_decode($body,true)[0],200);
-        die();
-    }
 }
 
 new WordPressPluginFrontend();
