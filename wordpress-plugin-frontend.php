@@ -25,6 +25,8 @@ class WordPressPluginFrontend {
     }
 
     function wp_activation(){
+        global $wpdb;
+
         /**1. create page**/
         # create page Contact-US
         $page_id = wp_insert_post(array(
@@ -50,6 +52,7 @@ class WordPressPluginFrontend {
             `created_datetime` datetime NOT NULL,
 		    UNIQUE KEY id (id)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        $wpdb->query($sql_contact_message);
         
         /**3. create table contact_email**/
         global $wpdb;
@@ -61,22 +64,24 @@ class WordPressPluginFrontend {
             `email` varchar(55) NOT NULL,
 		    UNIQUE KEY id (id)
           ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
-
-        # 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql_contact_message );
-        dbDelta( $sql_contact_email );
+        $wpdb->query($sql_contact_email);
     }
 
     function wp_deactivation(){
 
-        # 1.delete page
+        global $wpdb;
+
+        # 1.delete page 
         $page_id = get_option('wp-frontend');
         wp_delete_post($page_id);
 
-        # 1.delete table
-        global $wpdb;
+        # 2.delete table contact_message
         $table_name = $wpdb->prefix . 'contact_message';
+        $sql = "DROP TABLE IF EXISTS $table_name";
+        $wpdb->query($sql);
+
+        # 3.delete table contact_email
+        $table_name = $wpdb->prefix . 'contact_email';
         $sql = "DROP TABLE IF EXISTS $table_name";
         $wpdb->query($sql);
 
