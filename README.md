@@ -39,19 +39,19 @@ new WordPressPluginFrontend();
     }
 ```
 
-### 4. สร้างเพจหลังจาก activation
-1. สร้างเพจ WP Frontend
+### 4. Handle activation
+1. สร้างเพจ Contact-US
 2. สร้างตาราง contact_message
 ```
     function wp_activation(){
         /**1. create page**/
-        # create page WP Frontend
+        # create page Contact-US
         $page_id = wp_insert_post(array(
-            'post_title' => 'WP Frontend',
+            'post_title' => 'Contact-US',
             'post_type' => 'page',
             'post_status' => 'publish',
             'comment_status' => 'closed',
-            'post_content' => "[shortcode-wp-frontend]"
+            'post_content' => "[contact-us]"
         ));
 
         # save page_id
@@ -83,12 +83,12 @@ new WordPressPluginFrontend();
 ```
 
 ### 6. Add Shortcode และการ  Handle display
-Shortcode : `[shortcode-wp-frontend]`
+Shortcode : `[contact-us]`
 ```
     function __construct() {
         ...
         # Shortcode
-        add_shortcode('shortcode-wp-frontend', array($this, 'wp_shortcode_display'));
+        add_shortcode('contact-us', array($this, 'wp_shortcode_display'));
     }
     
     function wp_shortcode_display($atts){
