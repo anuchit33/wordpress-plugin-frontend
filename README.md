@@ -142,7 +142,7 @@ Shortcode : `[contact-us]`
 ```
 
 ### 7. สร้าง template
-สร้างไฟล์ `wordpress-plugin-frontend/template/frontend/page-contact.php`
+สร้างไฟล์ `wordpress-plugin-frontend/templates/frontend/page-contact.php`
 ```
 <form method="POST" action="<?php the_permalink();?>">
   <?php wp_nonce_field( 'post-contact','csrf' ); ?>
